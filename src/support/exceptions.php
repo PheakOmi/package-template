@@ -2,9 +2,9 @@
 /**
  *  Exception handling
  *
- * @package     TO FILL
- * @since       TO FILL
- * @author      Mathieu Lamiot
+ * @package     wp-page-fold-hyperlinks-tracking
+ * @since       1.0.0
+ * @author      Sopheak DY
  * @license     GPL-2.0-or-later
  */
 

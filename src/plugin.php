@@ -2,9 +2,9 @@
 /**
  * Plugin main class
  *
- * @package     TO FILL
- * @since       TO FILL
- * @author      Mathieu Lamiot
+ * @package     wp-page-fold-hyperlinks-tracking
+ * @since       1.0.0
+ * @author      Sopheak DY
  * @license     GPL-2.0-or-later
  */
 
@@ -31,6 +31,22 @@ class Rocket_Wpc_Plugin_Class {
 	 * @return void
 	 */
 	public static function wpc_activate() {
+		global $wpdb;
+		$table           = $wpdb->prefix . 'page_fold_visits';
+		$charset_collate = $wpdb->get_charset_collate();
+		$sql             = "CREATE TABLE IF NOT EXISTS $table (
+			id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+			visit_time DATETIME NOT NULL,
+			screen_width INT NOT NULL,
+			screen_height INT NOT NULL,
+			hrefs TEXT NOT NULL,
+			PRIMARY KEY (id)
+		) $charset_collate;";
+		require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+		dbDelta( $sql );
+		if ( ! wp_next_scheduled( 'wp_page_fold_cleanup' ) ) {
+			wp_schedule_event( time(), 'daily', 'wp_page_fold_cleanup' );
+		}
 		// Security checks.
 		if ( ! current_user_can( 'activate_plugins' ) ) {
 			return;
@@ -51,6 +67,7 @@ class Rocket_Wpc_Plugin_Class {
 		}
 		$plugin = isset( $_REQUEST['plugin'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['plugin'] ) ) : '';
 		check_admin_referer( "deactivate-plugin_{$plugin}" );
+		wp_clear_scheduled_hook( 'wp_page_fold_cleanup' );
 	}
 
 	/**
@@ -59,10 +76,26 @@ class Rocket_Wpc_Plugin_Class {
 	 * @return void
 	 */
 	public static function wpc_uninstall() {
-
+		global $wpdb;
+		$table = $wpdb->prefix . 'page_fold_visits';
+		$wpdb->query( "DROP TABLE IF EXISTS $table" );
 		// Security checks.
 		if ( ! current_user_can( 'activate_plugins' ) ) {
 			return;
 		}
 	}
 }
+
+add_action(
+	'wp_page_fold_cleanup',
+	function () {
+		global $wpdb;
+		$table = $wpdb->prefix . 'page_fold_visits';
+		$wpdb->query(
+			$wpdb->prepare(
+				"DELETE FROM $table WHERE visit_time < %s",
+				gmdate( 'Y-m-d H:i:s', strtotime( '-7 days' ) )
+			)
+		);
+	}
+);
