@@ -43,18 +43,32 @@ When I get a problem like this, I like to break it into small, testable steps. I
 
 I chose this direction because it's robust, secure, and fits naturally into the WordPress ecosystem. It's also easy to build on—if you want to add charts, export data, or track other pages, it's all possible without major rewrites.
 
-## 6. Why This Is a Good Solution
+## 6. Testing Strategy
+
+I implemented comprehensive unit tests to ensure code quality and reliability:
+
+- **Unit Tests:** I created focused unit tests that verify individual components work correctly without dependencies on WordPress or external systems. These tests cover:
+  - **Admin Page Logic:** Testing HTML structure validation, data sanitization, screen size formatting, and URL validation
+  - **REST Endpoint Logic:** Testing JSON parsing, data validation, URL validation, screen size validation, and error handling
+  - **Data Cleanup Logic:** Testing date calculations, SQL query structure, retention periods, and scheduling logic
+
+- **Test Structure:** The unit tests use PHPUnit 8 with a mock-based approach that doesn't require a full WordPress installation, making them fast and reliable. They focus on testing the business logic and data processing rather than WordPress integration.
+
+- **Why This Approach:** Unit tests provide immediate feedback during development, catch regressions early, and serve as living documentation of how each component should behave. They're particularly valuable for data processing logic that needs to be reliable and secure.
+
+## 7. Why This Is a Good Solution
 
 - It's easy to use and maintain.
 - It's secure and doesn't bloat your database.
 - It gives you actionable info, not just raw data.
 - It's built the "WordPress way," so it'll play nicely with updates and other plugins.
+- It has comprehensive unit tests ensuring reliability and code quality.
 
 ## Future Improvements
 
-- **PHPCS Warnings:**
-  - There are some code style warnings about direct SQL queries, lack of caching, and not using `$wpdb->prepare()` for all queries. With more time, I would refactor the code to address these, especially for queries in the admin page and cleanup routines.
+- **Integration Tests:**
+  - While unit tests cover individual components, integration tests would verify that all parts work together correctly in a WordPress environment. This would include testing the complete data flow from JavaScript to database storage, admin page rendering with real WordPress hooks, and plugin lifecycle management.
 - **Admin Page Features:**
   - If I had more time, I would add filtering, aggregation, and maybe export options to the admin page to make it even more useful for analyzing trends.
-- **Testing:**
-  - More comprehensive unit and integration tests could be added for even greater reliability.
+- **Enhanced Testing:**
+  - More comprehensive integration tests could be added for even greater reliability, including end-to-end testing of the complete user workflow.

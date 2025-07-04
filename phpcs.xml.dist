@@ -24,24 +24,29 @@
 	<config name="testVersion" value="5.6-"/>
 	<config name="minimum_supported_wp_version" value="4.9"/>
 
-	<rule ref="WordPress">
-        <exclude name="WordPress.Files.FileName.NotHyphenatedLowercase" />
-	</rule>
+		<rule ref="WordPress">
+      <exclude name="WordPress.Files.FileName.NotHyphenatedLowercase" />
+		</rule>
     <rule ref="WordPress.WP.I18n">
-        <properties>
-            <property name="text_domain" type="array" value="rocket" />
-        </properties>
+			<properties>
+					<property name="text_domain" type="array">
+							<element value="rocket"/>
+					</property>
+			</properties>
     </rule>
-    <rule ref="WordPress.NamingConventions.PrefixAllGlobals">
-        <properties>
-            <property name="prefixes" type="array" value="rocket,wp_rocket" />
-        </properties>
-    </rule>
-    <rule ref="WordPress.Files.FileName">
-        <properties>
-            <property name="strict_class_file_names" value="false" />
-        </properties>
-    </rule>
+   <rule ref="WordPress.NamingConventions.PrefixAllGlobals">
+    <properties>
+      <property name="prefixes" type="array">
+				<element value="rocket"/>
+				<element value="wp_rocket"/>
+			</property>
+    </properties>
+  </rule>
+	<rule ref="WordPress.Files.FileName">
+		<properties>
+			<property name="strict_class_file_names" value="false" />
+		</properties>
+	</rule>
 	<rule ref="WordPress-Docs">
 		<exclude name="Squiz.Commenting.FileComment.Missing"/>
 		<exclude name="Squiz.Commenting.FileComment.MissingPackageTag"/>

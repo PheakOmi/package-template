@@ -2,10 +2,10 @@
 /**
  * Plugin main class
  *
- * @package     wp-page-fold-hyperlinks-tracking
- * @since       1.0.0
- * @author      Sopheak DY
- * @license     GPL-2.0-or-later
+ * @package wp-page-fold-hyperlinks-tracking
+ * @since   1.0.0
+ * @author  Sopheak DY
+ * @license GPL-2.0-or-later
  */
 
 namespace ROCKET_WP_CRAWLER;
@@ -14,6 +14,7 @@ namespace ROCKET_WP_CRAWLER;
  * Main plugin class. It manages initialization, install, and activations.
  */
 class Rocket_Wpc_Plugin_Class {
+
 	/**
 	 * Manages plugin initialization
 	 *
@@ -42,7 +43,7 @@ class Rocket_Wpc_Plugin_Class {
 			hrefs TEXT NOT NULL,
 			PRIMARY KEY (id)
 		) $charset_collate;";
-		require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+		include_once ABSPATH . 'wp-admin/includes/upgrade.php';
 		dbDelta( $sql );
 		if ( ! wp_next_scheduled( 'wp_page_fold_cleanup' ) ) {
 			wp_schedule_event( time(), 'daily', 'wp_page_fold_cleanup' );
@@ -78,7 +79,8 @@ class Rocket_Wpc_Plugin_Class {
 	public static function wpc_uninstall() {
 		global $wpdb;
 		$table = $wpdb->prefix . 'page_fold_visits';
-		$wpdb->query( "DROP TABLE IF EXISTS $table" );
+     // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.DirectDatabaseQuery.SchemaChange
+		$wpdb->query( "DROP TABLE IF EXISTS `{$table}`" );
 		// Security checks.
 		if ( ! current_user_can( 'activate_plugins' ) ) {
 			return;
@@ -91,11 +93,12 @@ add_action(
 	function () {
 		global $wpdb;
 		$table = $wpdb->prefix . 'page_fold_visits';
-		$wpdb->query(
-			$wpdb->prepare(
-				"DELETE FROM $table WHERE visit_time < %s",
-				gmdate( 'Y-m-d H:i:s', strtotime( '-7 days' ) )
-			)
+     // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.PreparedSQL.NotPrepared,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
+		$query = $wpdb->prepare(
+			"DELETE FROM {$table} WHERE visit_time < %s", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+			gmdate( 'Y-m-d H:i:s', strtotime( '-7 days' ) )
 		);
+		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+		$wpdb->query( $query ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.PreparedSQL.NotPrepared,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
 	}
 );
